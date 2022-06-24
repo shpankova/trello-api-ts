@@ -1,6 +1,6 @@
-const Joi = require('joi');
+import Joi from "joi"
 
-exports.boardValidation = (data) => {
+export const boardValidation = (data: any) => {
 
     const schema = Joi.object({
         name : Joi.string().max(40).required(),

@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { pool } from '../db';
-import { QueryResult } from 'pg';
 
-
+import ApiError from "../exceptions/api-error";
+import { boardValidation } from "../validation/board-validation";
 
 import boardService from '../service/board-service'
 
@@ -12,18 +11,15 @@ class BoardController {
         res: Response,
         next: NextFunction) {
         try {
-            const {name, color, description} = req.body
+            const {name, color, description, board_id } = req.body
 
-            const response = await boardService.createBoard(name, color, description)
-            // const response = await pool.query(`
-            // INSERT INTO
-            //     board
-            //     ( name, color, description ) 
-            // VALUES 
-            //     ($1, $2, $3)`,
-            //     [name, color, description]
-            // );
-            
+            const {error} = boardValidation(req.body)
+            if (error){
+                return next(ApiError.BadRequest('Not valid data', error.details[0].message))
+            } 
+
+            const board = await boardService.createBoard(name, color, description, board_id )
+
             res.json({
                 message: "Board added successfully!",
                 body: {
@@ -55,6 +51,11 @@ class BoardController {
         try {
             const { id } = req.params;
             const { name, color, description } = req.body;
+
+            const {error} = boardValidation(req.body)
+            if (error){
+                return next(ApiError.BadRequest('Not valid data', error.details[0].message))
+            } 
             const board = await boardService.updateBoardById(name, color, description, id)
             res.status(200).send({ message: "Board Updated Successfully!" });
         } catch (e) {
