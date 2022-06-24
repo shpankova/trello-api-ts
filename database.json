@@ -1,0 +1,10 @@
+{
+  "dev": {
+    "driver": "pg",
+    "user": "postgres",
+    "password": "61665786",
+    "host": "localhost",
+    "database": "trello-api-docker",
+    "port": "5431"
+  }
+}
