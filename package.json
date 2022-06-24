@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --config nodemon.json src/server.ts",
-    "start": "tsc && node dist/src/server.js"
+    "dev": "nodemon --config nodemon.json server.ts",
+    "start": "tsc && node dist/server.js",
+    "migrate": "db-migrate up"
   },
   "repository": {
     "type": "git",

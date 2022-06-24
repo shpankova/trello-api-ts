@@ -2,7 +2,7 @@ import {Pool} from 'pg'
 
 export const pool = new Pool({
     user: "postgres",
-    host: "localhost",
+    host: "postgres",
     database: "trello-api-docker",
     password: "61665786",
     port: 5432,
