@@ -1,7 +1,17 @@
 import Joi from "joi"
 
-export const cardValidation = (data: any) => {
+interface Data {
+    board_id: number;
+    name: string;
+    description: string;
+    estimate: string;
+    status: string;
+    due_date: string;
+    labels: string;
+    card_id: number;
+}
 
+export const cardValidation = (data: Data) => {
     const schema = Joi.object({
         board_id: Joi.number().integer(),
         name : Joi.string().max(40).required(),

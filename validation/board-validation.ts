@@ -1,7 +1,14 @@
 import Joi from "joi"
 
-export const boardValidation = (data: any) => {
+interface Data {
+    name: string;
+    color: string;
+    description: string;
+    role: string;
+    board_id: number;
+}
 
+export const boardValidation = (data: Data) => {
     const schema = Joi.object({
         name : Joi.string().max(40).required(),
         color : Joi.string().max(40).required(),
