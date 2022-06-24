@@ -1,11 +1,11 @@
-export declare const createBoard = `
+export const createBoard = `
     INSERT INTO
         board
         ( name, color, description ) 
     VALUES 
         ($1, $2, $3)`;
 
-export declare const findBoardById = `
+export const findBoardById = `
     SELECT 
         "board"."board_id",
         "board"."name" AS "board_name",
@@ -31,7 +31,7 @@ export declare const findBoardById = `
 
 
 
-export declare const findBoard = `
+export const findBoard = `
     SELECT EXISTS ( 
     SELECT 1
     FROM 
@@ -40,7 +40,7 @@ export declare const findBoard = `
         board_id = $1)`;
 
 
-export declare const updateBoardById = `
+export const updateBoardById = `
     UPDATE "board" 
     SET 
         name = $1, 
@@ -49,7 +49,7 @@ export declare const updateBoardById = `
     WHERE 
         board_id = $4`;
 
-export declare const deleteBoardById = `
+export const deleteBoardById = `
     DELETE FROM 
         "board" 
     WHERE 

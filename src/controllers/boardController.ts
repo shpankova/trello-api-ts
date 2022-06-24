@@ -1,4 +1,8 @@
 import { Request, Response, NextFunction } from "express";
+import { pool } from '../db';
+import { QueryResult } from 'pg';
+
+
 
 import boardService from '../service/board-service'
 
@@ -10,8 +14,17 @@ class BoardController {
         try {
             const {name, color, description} = req.body
 
-            const board = await boardService.createBoard(name, color, description)
-            res.status(201).send({
+            const response = await boardService.createBoard(name, color, description)
+            // const response = await pool.query(`
+            // INSERT INTO
+            //     board
+            //     ( name, color, description ) 
+            // VALUES 
+            //     ($1, $2, $3)`,
+            //     [name, color, description]
+            // );
+            
+            res.json({
                 message: "Board added successfully!",
                 body: {
                     board: { name, color, description },

@@ -1,5 +1,6 @@
 import {Pool} from 'pg'
-const pool = new Pool({
+
+export const pool = new Pool({
     user: "postgres",
     host: "localhost",
     database: "trello-api-docker",
@@ -11,5 +12,4 @@ pool.on('connect', () => {
     console.log('DB connected succesfuly!');
 });
 
-export default pool;
 

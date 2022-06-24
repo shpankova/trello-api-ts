@@ -1,5 +1,6 @@
-import Joi from "joi"
-export default function boardValidation (data: any) {
+const Joi = require('joi');
+
+exports.boardValidation = (data) => {
 
     const schema = Joi.object({
         name : Joi.string().max(40).required(),
