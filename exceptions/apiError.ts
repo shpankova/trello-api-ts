@@ -1,5 +1,5 @@
 
-export default class ApiError extends Error {
+class ApiError extends Error {
     status: number;
     errors?: string;
 
@@ -14,3 +14,5 @@ export default class ApiError extends Error {
         return new ApiError(400, message, errors);
     }
 }
+
+  export default ApiError;

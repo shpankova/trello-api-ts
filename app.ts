@@ -1,10 +1,10 @@
 import express, { Application } from 'express';
 import helmet from 'helmet';
 
-import routerBoard from './routes/board'
-import routerCard from './routes/card'
+import routerBoard from './routes/boardRoutes'
+import routerCard from './routes/cardRoutes'
 
-// import errorMiddleware from './middlewares/error-middleware';
+import errorMiddleware from './middlewares/errorMiddleware';
 
 
 

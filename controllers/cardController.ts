@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { QueryResult } from 'pg';
 
-import ApiError from "../exceptions/api-error";
-import { cardValidation } from "../validation/card-validation"; 
+import ApiError from "../exceptions/apiError";
+import { cardValidation } from "../validation/cardValidation"; 
 
-import cardService from "../service/card-service";
+import cardService from "../service/cardService";
 
 class CardController {
     async createCard(

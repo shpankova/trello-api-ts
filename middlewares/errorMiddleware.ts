@@ -1,8 +1,7 @@
 import { Response } from "express";
-import ApiError from "../exceptions/api-error";
+import ApiError from "../exceptions/apiError";
 
-
-export default function (err: Error, res: Response) {
+function errorMiddleware (err: ApiError, res: Response) {
     console.log(err);
     if (err instanceof ApiError) {
         return res.status(err.status).json({message: err.message, errors: err.errors})
@@ -10,3 +9,5 @@ export default function (err: Error, res: Response) {
     return res.status(500).json({message: 'Unexpected error'})
 
 };
+ 
+export default errorMiddleware;

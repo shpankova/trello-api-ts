@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 
-import ApiError from "../exceptions/api-error";
-import { boardValidation } from "../validation/board-validation";
+import ApiError from "../exceptions/apiError";
+import { boardValidation } from "../validation/boardValidation";
 
-import boardService from '../service/board-service'
+import boardService from '../service/boardService'
 
 class BoardController {
     async createBoard(
