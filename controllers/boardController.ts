@@ -1,11 +1,17 @@
 import { Request, Response, NextFunction } from "express";
 
 import ApiError from "../exceptions/apiError";
-import { boardValidation } from "../validation/boardValidation";
-
+import { ValidationPGImpl } from "../interfaces/validation.interface";
 import boardService from '../service/boardService'
 
 class BoardController {
+    validation: ValidationPGImpl;
+
+    constructor(validation: ValidationPGImpl) {
+        this.validation = validation;
+    }
+
+
     async createBoard(
         req: Request,
         res: Response,
@@ -13,7 +19,7 @@ class BoardController {
         try {
             const {name, color, description, board_id } = req.body
 
-            const {error} = boardValidation(req.body)
+            const {error} = this.validation.boardValidation(req.body)
             if (error){
                 return next(ApiError.BadRequest('Not valid data', error.details[0].message))
             } 
@@ -52,7 +58,7 @@ class BoardController {
             const { id } = req.params;
             const { name, color, description } = req.body;
 
-            const {error} = boardValidation(req.body)
+            const {error} = this.validation.boardValidation(req.body)
             if (error){
                 return next(ApiError.BadRequest('Not valid data', error.details[0].message))
             } 
@@ -76,4 +82,4 @@ class BoardController {
     } 
 }
 
-export default new BoardController();
+export default new BoardController(new ValidationPGImpl);
