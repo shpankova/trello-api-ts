@@ -1,18 +1,17 @@
 
 class ApiError extends Error {
-    status: number;
-    errors?: string;
+  status: number;
+  errors: any;
 
-    constructor(status: number, message: string, errors?: string) {
-        super(message);
-        this.status = status;
-        this.errors = errors;
-    }
+  constructor (status: number, message: string, errors: any = {}) {
+    super(message);
+    this.status = status;
+    this.errors = errors;
+  }
 
-
-    static BadRequest(message: string, errors?: string) {
-        return new ApiError(400, message, errors);
-    }
+  static BadRequest (message: string, errors: any = {}) {
+    return new ApiError(400, message, errors);
+  }
 }
 
-  export default ApiError;
+export default ApiError;

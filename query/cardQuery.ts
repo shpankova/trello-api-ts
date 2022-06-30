@@ -3,7 +3,8 @@ INSERT INTO
     "card" 
     ( board_id, name, description, estimate, status, due_date, labels) 
 VALUES 
-    ($1, $2, $3, $4, $5, $6, $7)`;
+    ($1, $2, $3, $4, $5, $6, $7)
+    RETURNING *`;
 
 export const findCardById = `
 SELECT 
@@ -20,8 +21,6 @@ FROM
 WHERE 
     card_id = $1`;
 
-
-
 export const findCard = `
 SELECT EXISTS ( 
 SELECT 1
@@ -29,7 +28,6 @@ FROM
     "card" 
 WHERE 
     card_id = $1)`;
-
 
 export const updateCardById = `
 UPDATE 
@@ -43,12 +41,12 @@ SET
     due_date = $6,
     labels = $7
 WHERE 
-    card_id = $8`;
+    card_id = $8
+    RETURNING *`;
 
 export const deleteCardById = `
 DELETE FROM 
     "card" 
 WHERE 
-    card_id = $1`;
-
-
+    card_id = $1
+    RETURNING *`;
