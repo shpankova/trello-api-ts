@@ -1,38 +1,45 @@
-import { BoardServicePGImpl } from "../interfaces/boardService.interface";
-import { BoardRepositoryPGImpl } from "../interfaces/boardRepository.interface";
-import ApiError from "../exceptions/apiError";
+import { pool } from "../db";
+
+import { createBoard, findBoardById, updateBoardById, deleteBoardById, findBoard } from "../query/boardQuery";
+import { Board, ResBoard } from "../types/boardType";
 
 class BoardService {
+  async createBoard (board: Board): Promise<ResBoard> {
+    const boards = await pool.query(findBoard,
+      [board.board_id]
+    );
 
-    boardService: BoardServicePGImpl;
-
-    constructor(boardService: BoardServicePGImpl) {
-        this.boardService = boardService;
+    if (boards.rows[0].exists) {
+      throw new Error("Board exists");
     }
 
-    async createBoard(name: string, color: string, description: string, board_id: number ) {
-        const board = await this.boardService.createBoard(name, color, description, board_id)
-        return board
+    const createBoards = await pool.query(createBoard,
+      [board.name, board.color, board.description]);
+
+    return createBoards.rows[0];
+  }
+
+  async findBoardById (id: string): Promise<ResBoard> {
+    const board = await pool.query(findBoardById, [id]);
+
+    if (!board.rows[0]) {
+      throw new Error("Nothing was found");
     }
 
-    async findBoardById(id: string) {
-        const { rows } = await this.boardService.findBoardById(id);
+    return board.rows[0];
+  }
 
-        if (!rows.length) {
-            throw ApiError.BadRequest('Nothing was found')
-        }
-        return rows
-    }
+  async updateBoardById (board: Board, id: string): Promise<ResBoard> {
+    const updateBoard = await pool.query(updateBoardById,
+      [board.name, board.color, board.description, id]
+    );
+    return updateBoard.rows[0];
+  }
 
-    async updateBoardById(name: string, color: string, description: string, id: string) {
-        const { rows } = await this.boardService.updateBoardById(name, color, description, id)
-        return rows
-    }
-
-    async deleteBoardById(id: string) {
-        const board = await this.boardService.deleteBoardById(id);
-        return board
-    }
+  async deleteBoardById (id: string): Promise<ResBoard> {
+    const board = await pool.query(deleteBoardById, [id]);
+    return board.rows[0];
+  }
 }
 
-export default new BoardService(new BoardServicePGImpl(new BoardRepositoryPGImpl));
+export default new BoardService();

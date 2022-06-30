@@ -1,51 +1,43 @@
-import { CardServicePGImpl } from "../interfaces/cardService.interface";
-import { CardRepositoryPGImpl } from "../interfaces/cardRepository.interface";
-import ApiError from "../exceptions/apiError";
+import { pool } from "../db";
+
+import { createCard, findCardById, updateCardById, deleteCardById, findCard } from "../query/cardQuery";
+import { Card, ResCard } from "../types/cardType";
 
 class CardService {
-
-    cardService: CardServicePGImpl;
-
-    constructor(cardService: CardServicePGImpl) {
-        this.cardService = cardService;
+  async createCard (card: Card): Promise<ResCard> {
+    const cards = await pool.query(findCard,
+      [card.card_id]
+    );
+    if (cards.rows[0].exists) {
+      throw new Error("Card exists");
     }
-    
-    async createCard(board_id: number,
-                    name: string,
-                    description: string,
-                    estimate: string,
-                    status: string,
-                    due_date: string,
-                    labels: string,
-                    card_id: number) {
-        const card = await this.cardService.createCard(board_id, name, description, estimate, status, due_date, labels, card_id)
-        return card
-    }
+    const createdCard = await pool.query(createCard,
+      [card.board_id, card.name, card.description, card.estimate, card.status, card.due_date, card.labels]
+    );
 
-    async findCardById(id: string) {
-        const { rows } = await this.cardService.findCardById(id);
-        if (!rows.length) {
-            throw ApiError.BadRequest('Nothing was found')
-        }
-        return rows
-    }
+    return createdCard.rows[0];
+  }
 
-    async updateCardById(board_id: number,
-        name: string,
-        description: string,
-        estimate: string,
-        status: string,
-        due_date: string,
-        labels: string,
-        id: string) {
-        const { rows } = await this.cardService.updateCardById(board_id, name, description, estimate, status, due_date, labels, id)
-        return rows
-    }
+  async findCardById (id: string): Promise<ResCard> {
+    const foundCard = await pool.query(findCardById, [id]);
 
-    async deleteCardById(id: string) {
-        const card = await this.cardService.deleteCardById(id)
-        return card
+    if (!foundCard.rows[0]) {
+      throw new Error("Nothing was found");
     }
+    return foundCard.rows[0];
+  }
+
+  async updateCardById (card: Card, id: string): Promise<ResCard> {
+    const UpdatedCard = await pool.query(updateCardById,
+      [card.board_id, card.name, card.description, card.estimate, card.status, card.due_date, card.labels, id]);
+    return UpdatedCard.rows[0];
+  }
+
+  async deleteCardById (id: string): Promise<ResCard> {
+    const card = await pool.query(deleteCardById,
+      [id]);
+    return card.rows[0];
+  }
 }
 
-export default new CardService(new CardServicePGImpl(new CardRepositoryPGImpl));
+export default new CardService();
