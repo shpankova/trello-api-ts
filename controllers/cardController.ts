@@ -1,83 +1,82 @@
 import { Request, Response, NextFunction } from "express";
 
 import ApiError from "../exceptions/apiError";
-import { ValidationPGImpl } from "../interfaces/validation.interface";
+import { cardValidation } from "../validation/card-validation";
 import cardService from "../service/cardService";
 
 class CardController {
-    validation: ValidationPGImpl;
+  async createCard (req: Request, res: Response, next: NextFunction) {
+    try {
+      const { error } = cardValidation(req.body);
+      if (error) {
+        return next(ApiError.BadRequest("Not valid data", error.details[0].message));
+      }
 
-    constructor(validation: ValidationPGImpl) {
-        this.validation = validation;
+      const card = await cardService.createCard(req.body);
+
+      res.json({
+        message: "Card added successfully!",
+        body: {
+          card
+        }
+      });
+    } catch (err) {
+      if (err.message === "Card exists") {
+        next(ApiError.BadRequest("This card already exists"));
+      } else { next(err); }
     }
+  }
 
-    async createCard(
-        req: Request,
-        res: Response,
-        next: NextFunction) {
-        try {
-            const { board_id, name, description, estimate, status, due_date, labels, card_id } = req.body
-            const { error } = this.validation.cardValidation(req.body)
-            if (error) {
-                return next(ApiError.BadRequest('Not valid data', error.details[0].message))
-            }
-            
-            const card = await cardService.createCard(board_id, name, description, estimate, status, due_date, labels, card_id)
+  async findCardById (req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const card = await cardService.findCardById(id);
 
-            res.json({
-                message: "Card added successfully!",
-                body: {
-                    card: { board_id, name, description, estimate, status, due_date, labels },
-                },
-            });
-        } catch (e) {
-            next(e)
+      return res.json({
+        message: "Card found successfully!",
+        body: { card }
+      });
+    } catch (err) {
+      if (err.message === "Nothing was found") {
+        next(ApiError.BadRequest("Nothing was found"));
+      } else { next(err); }
+    }
+  }
+
+  async updateCardById (req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+
+      const { error } = cardValidation(req.body);
+      if (error) {
+        return next(ApiError.BadRequest("Not valid data", error.details[0].message));
+      }
+      const card = await cardService.updateCardById(req.body, id);
+      res.json({
+        message: "Card Updated Successfully!",
+        body: {
+          card
         }
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
 
-    };
-
-    async findCardById(req: Request,
-        res: Response,
-        next: NextFunction
-        ) {
-        try {
-            const { id } = req.params;
-            const card = await cardService.findCardById(id)
-            return res.json(card)
-        } catch (e) {
-           next(e)
+  async deleteCardById (req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const card = await cardService.deleteCardById(id);
+      res.json({
+        message: "Card deleted successfully!",
+        body: {
+          card
         }
-    };
-
-    async updateCardById(req: Request,
-        res: Response,
-        next: NextFunction) {
-        try {
-            const { id } = req.params;
-            const { board_id, name, description, estimate, status, due_date, labels } = req.body;
-
-            const { error } = this.validation.cardValidation(req.body)
-            if (error) {
-                return next(ApiError.BadRequest('Not valid data', error.details[0].message))
-            }
-            const card = await cardService.updateCardById(board_id, name, description, estimate, status, due_date, labels, id)
-            res.json({message: "Card Updated Successfully!"});
-        } catch (e) {
-            next(e)
-        }
-    };
-
-    async deleteCardById(req: Request,
-        res: Response,
-        next: NextFunction) {
-        try {
-            const { id } = req.params;
-            const card = await cardService.deleteCardById(id)
-            res.json({message: "Card deleted successfully!"});
-        } catch (e) {
-            next(e)
-        }
-    } 
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
-export default new CardController(new ValidationPGImpl);
+export default new CardController();

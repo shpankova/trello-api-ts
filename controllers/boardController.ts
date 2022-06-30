@@ -1,85 +1,82 @@
 import { Request, Response, NextFunction } from "express";
 
 import ApiError from "../exceptions/apiError";
-import { ValidationPGImpl } from "../interfaces/validation.interface";
-import boardService from '../service/boardService'
+import { boardValidation } from "../validation/board-validation";
+import boardService from "../service/boardService";
 
 class BoardController {
-    validation: ValidationPGImpl;
-
-    constructor(validation: ValidationPGImpl) {
-        this.validation = validation;
+  async createBoard (req: Request, res: Response, next: NextFunction) {
+    try {
+      const { error } = boardValidation(req.body);
+      if (error) {
+        return next(ApiError.BadRequest("Not valid data", error.details[0].message));
+      }
+      const board = await boardService.createBoard(req.body);
+      res.json({
+        message: "Board added successfully!",
+        body: {
+          board
+        }
+      });
+    } catch (err) {
+      if (err.message === "Board exists") {
+        next(ApiError.BadRequest("This board already exists"));
+      } else {
+        next(err);
+      }
     }
+  }
 
+  async findBoardById (req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const board = await boardService.findBoardById(id);
+      return res.json({
+        message: "Board found successfully!",
+        body: { board }
+      });
+    } catch (err) {
+      if (err.message === "Nothing was found") {
+        next(ApiError.BadRequest("Nothing was found"));
+      } else {
+        next(err);
+      }
+    }
+  }
 
-    async createBoard(
-        req: Request,
-        res: Response,
-        next: NextFunction) {
-        try {
-            const {name, color, description, board_id } = req.body
-
-            const {error} = this.validation.boardValidation(req.body)
-            if (error){
-                return next(ApiError.BadRequest('Not valid data', error.details[0].message))
-            } 
-
-            const board = await boardService.createBoard(name, color, description, board_id )
-
-            res.json({
-                message: "Board added successfully!",
-                body: {
-                    board: { name, color, description },
-                },
-            });
-        } catch (e) {
-            next(e)
+  async updateBoardById (req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const { error } = boardValidation(req.body);
+      if (error) {
+        return next(ApiError.BadRequest("Not valid data", error.details[0].message));
+      }
+      const board = await boardService.updateBoardById(req.body, id);
+      res.status(200).send({
+        message: "Board Updated Successfully!",
+        body: {
+          board
         }
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
 
-    };
-
-    async findBoardById(req: Request,
-        res: Response,
-        next: NextFunction
-        ) {
-        try {
-            const { id } = req.params;
-            const board = await boardService.findBoardById(id)
-            return res.json(board)
-        } catch (e) {
-           next(e)
+  async deleteBoardById (req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const board = await boardService.deleteBoardById(id);
+      res.status(200).send({
+        message: "Board deleted successfully!",
+        body: {
+          board
         }
-    };
-
-    async updateBoardById(req: Request,
-        res: Response,
-        next: NextFunction) {
-        try {
-            const { id } = req.params;
-            const { name, color, description } = req.body;
-
-            const {error} = this.validation.boardValidation(req.body)
-            if (error){
-                return next(ApiError.BadRequest('Not valid data', error.details[0].message))
-            } 
-            const board = await boardService.updateBoardById(name, color, description, id)
-            res.status(200).send({ message: "Board Updated Successfully!" });
-        } catch (e) {
-            next(e)
-        }
-    };
-
-    async deleteBoardById(req: Request,
-        res: Response,
-        next: NextFunction) {
-        try {
-            const { id } = req.params;
-            const board = await boardService.deleteBoardById(id)
-            res.status(200).send({ message: "Board deleted successfully!" });
-        } catch (e) {
-            next(e)
-        }
-    } 
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
-export default new BoardController(new ValidationPGImpl);
+export default new BoardController();
