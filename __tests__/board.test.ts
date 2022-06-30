@@ -1,48 +1,66 @@
+/* eslint-disable no-undef */
 import supertest from "supertest";
-
+import { pool } from "../db";
 import app from "../app";
+const request = supertest(app);
 
-const request = supertest(app)
+beforeAll(() => {
+  process.env.NODE_ENV = "test";
+  pool.query(`CREATE TABLE IF NOT EXISTS "board"
+  (   "board_id" SERIAL PRIMARY KEY, 
+      "name" text NOT NULL,
+      "color" text NOT NULL,
+      "description" text NOT NULL,
+      "created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+  )
+  `);
+});
 
-describe('Board Endpoints', () => {
-  it('should create a new board', async () => {
+afterAll(() => {
+  pool.query(`DROP TABLE
+  "board"`);
+});
+
+describe("Board Endpoints", () => {
+  it("should create a new board", async () => {
     const res = await request
-     .post('/api/boards')
-     .send({
-        role: 'admin',
-        name: 'evdegd', 
-        color: '3',
-        description: 'add routes',  
-        board_id: 18,
-      });
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toHaveProperty('body.board');
-  });
-
-  it('should find a board by id', async () => {
-    const res = await request.get(`/api/boards/4`);
-    expect(res.statusCode).toEqual(200);
-  });
-
-  it('should update a board by id', async () => {
-    const res = await request
-      .put('/api/boards/2')
+      .post("/api/boards")
       .send({
-        role: 'admin',
-        name: 'evdegd', 
-        color: '3',
-        description: 'add routes',  
-        board_id: 18,    
+        name: "evdegd",
+        color: "3",
+        description: "add routes",
+        board_id: 2,
+        role: "admin"
       });
     expect(res.statusCode).toEqual(200);
-    expect(res.body).toHaveProperty('message');
+    expect(res.body.message).toBe("Board added successfully!");
   });
 
-  it('should delete a board by id', async () => {
-    const res = await request
-    .delete('/api/boards/4')
-    .send({role: 'admin'});
+  it("should find a board by id", async () => {
+    const res = await request.get("/api/boards/1");
     expect(res.statusCode).toEqual(200);
+    expect(res.body.message).toBe("Board found successfully!");
   });
 
+  it("should update a board by id", async () => {
+    const res = await request
+      .put("/api/boards/1")
+      .send({
+        role: "admin",
+        name: "evdegd",
+        color: "5",
+        description: "add routes",
+        board_id: 1
+      });
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.message).toBe("Board Updated Successfully!");
+  });
+
+  it("should delete a board by id", async () => {
+    const res = await request
+      .delete("/api/boards/1")
+      .send({ role: "admin" });
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.message).toBe("Board deleted successfully!");
+  });
 });
