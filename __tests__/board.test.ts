@@ -1,11 +1,18 @@
 /* eslint-disable no-undef */
 import supertest from "supertest";
-import { pool } from "../db";
+import { Pool } from "pg";
 import app from "../app";
 const request = supertest(app);
 
 beforeAll(() => {
   process.env.NODE_ENV = "test";
+  const pool = new Pool({
+    user: "postgres",
+    host: "localhost",
+    database: "test",
+    password: "61665786",
+    port: 5432
+  });
   pool.query(`CREATE TABLE IF NOT EXISTS "board"
   (   "board_id" SERIAL PRIMARY KEY, 
       "name" text NOT NULL,
@@ -17,6 +24,13 @@ beforeAll(() => {
 });
 
 afterAll(() => {
+  const pool = new Pool({
+    user: "postgres",
+    host: "localhost",
+    database: "test",
+    password: "61665786",
+    port: 5432
+  });
   pool.query(`DROP TABLE
   "board"`);
 });
