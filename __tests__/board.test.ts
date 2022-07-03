@@ -4,7 +4,7 @@ import { Pool } from "pg";
 import app from "../app";
 const request = supertest(app);
 
-beforeAll(() => {
+beforeAll(async () => {
   process.env.NODE_ENV = "test";
   const pool = new Pool({
     user: "postgres",
@@ -13,7 +13,7 @@ beforeAll(() => {
     password: "61665786",
     port: 5432
   });
-  pool.query(`CREATE TABLE IF NOT EXISTS "board"
+  await pool.query(`CREATE TABLE IF NOT EXISTS "board"
   (   "board_id" SERIAL PRIMARY KEY, 
       "name" text NOT NULL,
       "color" text NOT NULL,
