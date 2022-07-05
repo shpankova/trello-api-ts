@@ -1,4 +1,4 @@
-/* eslint-disable no-undef */
+import { expect, beforeAll, afterAll, describe, it } from "@jest/globals";
 import supertest from "supertest";
 import { Pool } from "pg";
 import app from "../app";
