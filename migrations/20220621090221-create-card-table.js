@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-new-wrappers */
 "use strict";
 
 let dbm;
