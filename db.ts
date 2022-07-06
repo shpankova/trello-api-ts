@@ -23,7 +23,3 @@ if (env === "test") {
 }
 
 export const pool = new Pool(config);
-
-pool.on("connect", () => {
-  console.log("DB connected succesfuly!");
-});
